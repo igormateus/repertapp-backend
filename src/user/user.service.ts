@@ -4,12 +4,21 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { findManyCursorConnection } from '@devoxa/prisma-relay-cursor-connection';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto) {
+  async hashPassword(password: string) {
+    const saltRounds = 12;
+    const hash = await bcrypt.hash(password, saltRounds);
+    return hash;
+  }
+
+  async create(createUserDto: CreateUserDto) {
+    createUserDto.password = await this.hashPassword(createUserDto.password);
+
     return this.prisma.user.create({
       data: { ...createUserDto },
     });
@@ -29,7 +38,11 @@ export class UserService {
     });
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    if (!!updateUserDto.password) {
+      updateUserDto.password = await this.hashPassword(updateUserDto.password);
+    }
+    
     return this.prisma.user.update({
       where: { id },
       data: { ...updateUserDto },
