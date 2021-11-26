@@ -10,12 +10,12 @@ import { BandsModule } from './bands/bands.module';
 
 @Module({
   imports: [
-    UserModule,
     PrismaModule,
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    UserModule,
     ProfileModule,
     BandsModule,
   ],

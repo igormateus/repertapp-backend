@@ -13,13 +13,13 @@ import { Profile } from './entities/profile.dto';
 import { ProfileService } from './profile.service';
 
 @Controller('profiles')
+@UseGuards(JwtAuthGuard)
 @ApiTags('profiles')
 @ApiExtraModels(Page)
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: Profile })
   async findOne(@Param('id') id: string) {
@@ -27,7 +27,6 @@ export class ProfileController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiPageResponse(Profile)
   async findAll(@Query() connectionArgs: ConnectionArgs) {
