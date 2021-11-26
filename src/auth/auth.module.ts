@@ -12,7 +12,7 @@ const secret = process.env.JWT_SECRET;
     PassportModule,
     JwtModule.register({
       secret,
-      signOptions: { expiresIn: '60s' }, // e.g. 7d, 24h
+      signOptions: { expiresIn: '24h' }, // e.g. 7d, 24h
     }),
   ],
   controllers: [AuthController],
