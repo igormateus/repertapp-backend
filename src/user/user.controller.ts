@@ -1,3 +1,4 @@
+import { UserAuthenticate } from './../auth/user-authenticate.decorator';
 import {
   Body,
   Controller,
@@ -42,8 +43,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: User })
-  async findOne(@Request() request) {
-    return await this.userService.findOne(request.user.id);
+  async findOne(@UserAuthenticate('id') userId: string) {
+    return await this.userService.findOne(userId);
   }
 
   // @Get()
