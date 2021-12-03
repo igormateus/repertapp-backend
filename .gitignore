@@ -37,5 +37,6 @@ lerna-debug.log*
 # Db
 *.db
 
-# Env
+# dotenv environment variables file
 .env
+.env.test
