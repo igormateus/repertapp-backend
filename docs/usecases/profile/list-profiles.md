@@ -8,9 +8,10 @@
     }
 
 > ## Main Flow
-1. Fetch users by connectionArgs;
-2. Map users to profile Type;
-3. Return Page<profile>;
+1. User must by authenticated
+2. Fetch users by connectionArgs;
+3. Map users to profile Type;
+4. Return Page<profile>;
 
 > ## Alternative Flow: Invalid data
 1. Throw error

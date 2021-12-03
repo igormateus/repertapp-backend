@@ -7,11 +7,12 @@
     - bio
 
 > ## Main Flow
-1. Get data for update and user id authenticated;
-2. Validate data;
-3. Verify unique values (username, email);
-4. Update user on repository;
-5. Return user without password;
+1. User must by authenticated
+2. Get data for update and user id authenticated;
+3. Validate data;
+4. Verify unique values (username, email);
+5. Update user on repository;
+6. Return user without password;
 
 > ## Alternative Flow: Invalid data
 1. Throw error
