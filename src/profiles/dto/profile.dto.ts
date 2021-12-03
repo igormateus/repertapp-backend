@@ -12,9 +12,6 @@ export class Profile {
 
   @ApiProperty()
   bio: string | null;
-
-  @ApiProperty()
-  imageUrl: string | null;
 }
 
 export type ProfileType = {
@@ -22,7 +19,6 @@ export type ProfileType = {
   name?: string;
   username: string;
   bio?: string;
-  imageUrl?: string;
 };
 
 type ProfileSelect = {
@@ -30,12 +26,10 @@ type ProfileSelect = {
   name: boolean;
   username: boolean;
   bio: boolean;
-  imageUrl: boolean;
 };
 export const profileSelect: ProfileSelect = {
   id: true,
   name: true,
   username: true,
   bio: true,
-  imageUrl: true,
 };

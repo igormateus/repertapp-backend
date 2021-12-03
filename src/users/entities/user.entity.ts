@@ -48,6 +48,7 @@ type UserSelect = {
   name: boolean;
   bio: boolean;
 };
+
 export const userSelect: UserSelect = {
   id: true,
   createdAt: true,
