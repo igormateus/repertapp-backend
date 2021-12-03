@@ -1,3 +1,5 @@
+import { AuthDto } from './../auth/dto/auth.dto';
+import { UserAuth } from './../auth/user-auth.decorator';
 import { ApiPageResponse } from './../page/api-page-response.decorator';
 import { ConnectionArgs } from './../page/connection-args.dto';
 import {
@@ -8,7 +10,6 @@ import {
   Patch,
   Post,
   Query,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -35,29 +36,35 @@ export class BandsController {
 
   @Post()
   @ApiCreatedResponse({ type: Band })
-  async create(@Request() req, @Body() createBandDto: CreateBandDto) {
-    return await this.bandsService.create(req.user.id, createBandDto);
+  async create(
+    @UserAuth() userAuth: AuthDto,
+    @Body() createBandDto: CreateBandDto,
+  ) {
+    return await this.bandsService.create(userAuth.id, createBandDto);
   }
 
   @Get()
   @ApiPageResponse(Band)
-  async findAll(@Request() req, @Query() connectionArgs: ConnectionArgs) {
-    return await this.bandsService.findAll(req.user.id, connectionArgs);
+  async findAll(
+    @UserAuth() userAuth: AuthDto,
+    @Query() connectionArgs: ConnectionArgs,
+  ) {
+    return await this.bandsService.findAll(userAuth.id, connectionArgs);
   }
 
   @Get(':id')
   @ApiOkResponse({ type: Band })
-  async findOne(@Request() req, @Param('id') id: string) {
-    return await this.bandsService.findOne(req.user.id, id);
+  async findOne(@UserAuth() userAuth: AuthDto, @Param('id') id: string) {
+    return await this.bandsService.findOne(userAuth.id, id);
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: Band })
   async update(
-    @Request() req,
+    @UserAuth() userAuth: AuthDto,
     @Param('id') id: string,
     @Body() updateBandDto: UpdateBandDto,
   ) {
-    return await this.bandsService.update(req.user.id, id, updateBandDto);
+    return await this.bandsService.update(userAuth.id, id, updateBandDto);
   }
 }
