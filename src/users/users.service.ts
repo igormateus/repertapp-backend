@@ -12,7 +12,6 @@ export class UsersService {
     private readonly authService: AuthService,
   ) {}
 
-  // TODO: encript password
   async create(createUserDto: CreateUserDto): Promise<User> {
     createUserDto.password = await this.authService.hashPassword(
       createUserDto.password,
@@ -33,7 +32,6 @@ export class UsersService {
     return this.responseUser(user);
   }
 
-  // TODO: encript password
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     if (updateUserDto.password)
       updateUserDto.password = await this.authService.hashPassword(
