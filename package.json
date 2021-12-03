@@ -1,10 +1,10 @@
 {
   "name": "repertapp-api",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "version": "0.1.0",
+  "description": "Manage your setlist",
+  "author": "Igor Mateus",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",

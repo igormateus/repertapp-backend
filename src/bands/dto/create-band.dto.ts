@@ -1,14 +1,14 @@
-import { IsNotEmpty, IsOptional, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, MinLength, IsOptional, MaxLength } from 'class-validator';
 
 export class CreateBandDto {
   @IsNotEmpty()
-  @MinLength(3)
+  @MinLength(5)
   @ApiProperty()
   name: string;
 
   @IsOptional()
-  @MinLength(5)
-  @ApiProperty({ required: false })
-  description?: string | null;
+  @MaxLength(250)
+  @ApiProperty({ required: false, nullable: true })
+  description: string;
 }

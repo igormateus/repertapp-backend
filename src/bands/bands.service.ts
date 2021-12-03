@@ -1,8 +1,17 @@
-import { ConnectionArgs } from 'src/page/connection-args.dto';
+import { Page } from './../page/page.dto';
+import { ConnectionArgs } from './../page/connection-args.dto';
 import { findManyCursorConnection } from '@devoxa/prisma-relay-cursor-connection';
+import {
+  bandSelect,
+  bandSummarySelect,
+  BandSummaryType,
+} from './entities/band.entity';
 import { PrismaService } from './../prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
-import { Profile } from 'src/profile/entities/profile.dto';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateBandDto } from './dto/create-band.dto';
 import { UpdateBandDto } from './dto/update-band.dto';
 
@@ -10,56 +19,67 @@ import { UpdateBandDto } from './dto/update-band.dto';
 export class BandsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(userAuth: Profile, createBandDto: CreateBandDto) {
+  async create(creatorId: string, createBandDto: CreateBandDto) {
     return await this.prismaService.band.create({
       data: {
         ...createBandDto,
         members: {
-          connect: [{ id: userAuth.id }],
+          connect: { id: creatorId },
         },
       },
-      include: {
-        members: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            bio: true,
-            imageUrl: true,
-          },
-        },
-      },
+      select: { ...bandSelect },
     });
   }
 
-  async findAll(userAuth: Profile, connectionArgs: ConnectionArgs) {
-    return findManyCursorConnection(
+  async findAll(userId: string, connectionArgs: ConnectionArgs) {
+    const where = {
+      members: {
+        some: { id: userId },
+      },
+    };
+
+    const bandsPage = await findManyCursorConnection(
       (args) =>
         this.prismaService.band.findMany({
           ...args,
-          where: {
-            members: { some: { id: userAuth.id } },
-          },
+          where,
+          select: bandSummarySelect,
         }),
-      () =>
-        this.prismaService.band.count({
-          where: {
-            members: { some: { id: userAuth.id } },
-          },
-        }),
+      () => this.prismaService.band.count(),
       connectionArgs,
     );
+
+    return new Page<BandSummaryType>(bandsPage);
   }
 
-  findOne(userAuth: Profile, id: string) {
-    return `This action returns a #${id} band`;
+  async findOne(userId: string, bandId: string) {
+    const band = await this.prismaService.band.findUnique({
+      where: {
+        id: bandId,
+      },
+      select: { ...bandSelect },
+    });
+
+    if (!band)
+      throw new NotFoundException(`No band found with id: '${bandId}'`);
+
+    const hasMember = band.members.filter((user) => user.id === userId).length;
+
+    if (!hasMember)
+      throw new ForbiddenException(
+        `Unauthorized user to access band with id: '${bandId}'`,
+      );
+
+    return band;
   }
 
-  update(userAuth: Profile, id: string, updateBandDto: UpdateBandDto) {
-    return `This action updates a #${id} band`;
-  }
+  async update(userId: string, bandId: string, updateBandDto: UpdateBandDto) {
+    await this.findOne(userId, bandId);
 
-  remove(userAuth: Profile, id: string) {
-    return `This action removes a #${id} band`;
+    return await this.prismaService.band.update({
+      where: { id: bandId },
+      data: updateBandDto,
+      select: { ...bandSelect },
+    });
   }
 }

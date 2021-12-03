@@ -1,47 +1,48 @@
-import { PrismaService } from './../prisma/prisma.service';
 import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Auth } from './entity/auth.entity';
 import * as bcrypt from 'bcrypt';
+import configuration from './../config/configuration';
+import { PrismaService } from './../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwtService: JwtService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  async login(username: string, password: string): Promise<Auth> {
-    const user = await this.prisma.user.findUnique({
+  async hashPassword(password: string) {
+    return await bcrypt.hash(password, configuration().jwt.salt);
+  }
+
+  async validateUserById(id: string) {
+    return await this.prismaService.user.findUnique({
+      where: { id },
+    });
+  }
+
+  async login(username: string, password: string) {
+    const user = await this.prismaService.user.findUnique({
       where: { username },
+      select: {
+        id: true,
+        password: true,
+      },
     });
 
-    if (!user) {
+    if (!user)
       throw new NotFoundException(`No user found for username: ${username}`);
-    }
 
-    const passwordValid = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
-    if (!passwordValid) {
-      throw new UnauthorizedException('Invalid password');
-    }
+    if (!isMatch) throw new UnauthorizedException('Invalid password');
 
     return {
       accessToken: this.jwtService.sign({ userId: user.id }),
     };
-  }
-
-  validateUser(userId: string) {
-    return this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        name: true,
-        bio: true,
-        imageUrl: true,
-      },
-    });
   }
 }

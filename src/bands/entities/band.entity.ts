@@ -1,3 +1,4 @@
+import { profileSelect, Profile } from './../../profiles/dto/profile.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Band as BandPrisma } from '@prisma/client';
 
@@ -14,6 +15,51 @@ export class Band implements BandPrisma {
   @ApiProperty()
   name: string;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ nullable: true })
   description: string;
+
+  @ApiProperty({ type: [Profile] })
+  member: Profile[];
 }
+
+export type BandType = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  name: string;
+  description: string;
+};
+
+type BandSelect = {
+  id: boolean;
+  createdAt: boolean;
+  updatedAt: boolean;
+  name: boolean;
+  description: boolean;
+  members: { select: typeof profileSelect };
+};
+export const bandSelect: BandSelect = {
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  name: true,
+  description: true,
+  members: { select: profileSelect },
+};
+
+export type BandSummaryType = {
+  id: string;
+  name: string;
+  description: string;
+};
+
+type BandSummarySelect = {
+  id: boolean;
+  name: boolean;
+  description: boolean;
+};
+export const bandSummarySelect: BandSummarySelect = {
+  id: true,
+  name: true,
+  description: true,
+};

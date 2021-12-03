@@ -1,6 +1,6 @@
-import { PageInfo } from './page-info.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Edge } from './edge.dto';
+import { PageInfo } from './page-info.dto';
 
 export class Page<Record> {
   edges: Edge<Record>[];
@@ -10,4 +10,8 @@ export class Page<Record> {
 
   @ApiProperty()
   totalCount: number;
+
+  constructor(partial: Partial<Page<Record>>) {
+    Object.assign(this, partial);
+  }
 }
