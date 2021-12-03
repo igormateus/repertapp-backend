@@ -1,3 +1,4 @@
+import { authSelect } from './dto/auth.dto';
 import {
   Injectable,
   NotFoundException,
@@ -22,6 +23,7 @@ export class AuthService {
   async validateUserById(id: string) {
     return await this.prismaService.user.findUnique({
       where: { id },
+      select: authSelect,
     });
   }
 

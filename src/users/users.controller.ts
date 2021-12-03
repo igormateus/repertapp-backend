@@ -1,3 +1,4 @@
+import { AuthDto } from './../auth/dto/auth.dto';
 import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -27,7 +28,8 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: User })
-  async findOne(@UserAuth() userAuth) {
+  async findOne(@UserAuth() userAuth: AuthDto) {
+    console.log(userAuth);
     return await this.usersService.loadUser(userAuth.id);
   }
 
@@ -35,7 +37,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: User })
-  update(@UserAuth() userAuth, @Body() updateUserDto: UpdateUserDto) {
+  update(@UserAuth() userAuth: AuthDto, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(userAuth.id, updateUserDto);
   }
 }
