@@ -25,9 +25,6 @@ export class User implements UserPrisma {
 
   @ApiProperty({ required: false, nullable: true })
   bio: string | null;
-
-  @ApiProperty({ required: false, nullable: true })
-  imageUrl: string | null;
 }
 
 export type UserType = {
@@ -39,7 +36,6 @@ export type UserType = {
   email: string | null;
   name: string | null;
   bio: string | null;
-  imageUrl: string | null;
 };
 
 type UserSelect = {
@@ -51,7 +47,6 @@ type UserSelect = {
   email: boolean;
   name: boolean;
   bio: boolean;
-  imageUrl: boolean;
 };
 export const userSelect: UserSelect = {
   id: true,
@@ -62,5 +57,4 @@ export const userSelect: UserSelect = {
   email: true,
   name: true,
   bio: true,
-  imageUrl: true,
 };

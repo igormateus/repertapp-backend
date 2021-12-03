@@ -3,7 +3,6 @@ import {
   IsEmail,
   IsNotEmpty,
   IsOptional,
-  IsUrl,
   MaxLength,
   MinLength,
 } from 'class-validator';
@@ -33,19 +32,4 @@ export class CreateUserDto {
   @MaxLength(250)
   @ApiProperty({ required: false, nullable: true })
   bio: string | null;
-
-  constructor(
-    username: string,
-    password: string,
-    email?: string,
-    name?: string,
-    bio?: string,
-  ) {
-    this.username = username;
-    this.password = password;
-    this.email = !!email ? email : null;
-    this.name = !!name ? name : null;
-    this.bio = !!bio ? bio : null;
-    Object.freeze(this);
-  }
 }

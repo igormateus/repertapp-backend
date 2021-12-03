@@ -1,12 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Patch,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -14,6 +6,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
+import { UserAuth } from './../auth/user-auth.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -35,8 +28,8 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: User })
-  async findOne(@Request() req) {
-    return await this.usersService.findById(req.user.id);
+  async findOne(@UserAuth() userAuth) {
+    return await this.usersService.findById(userAuth.id);
   }
 
   // TODO: get auth userId
@@ -44,7 +37,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: User })
-  update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(req.user.id, updateUserDto);
+  update(@UserAuth() userAuth, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(userAuth.id, updateUserDto);
   }
 }

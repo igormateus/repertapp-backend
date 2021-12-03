@@ -1,11 +1,8 @@
-import { authServiceMock } from '../util/test/auth-service-mock';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthService } from './../auth/auth.service';
-import { prismaServiceMock } from './../util/test/prisma-service-mock';
 import { PrismaService } from './../prisma/prisma.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { exit } from 'process';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -14,10 +11,10 @@ describe('UsersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [UsersService, PrismaService, AuthService],
     })
-      .overrideProvider(PrismaService)
-      .useValue(prismaServiceMock)
-      .overrideProvider(AuthService)
-      .useValue(authServiceMock)
+      // .overrideProvider(PrismaService)
+      // .useValue(prismaServiceMock)
+      // .overrideProvider(AuthService)
+      // .useValue(authServiceMock)
       .compile();
 
     service = module.get<UsersService>(UsersService);
@@ -29,10 +26,7 @@ describe('UsersService', () => {
 
   describe('CreateUser', () => {
     it('should get data from new user', () => {
-      const sut = new CreateUserDto(
-        // 'username_test',
-        // 'password_test',
-      );
+      const sut = new CreateUserDto();
 
       expect(sut).toHaveProperty('username');
       expect(sut).toHaveProperty('password');
