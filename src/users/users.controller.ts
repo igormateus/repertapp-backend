@@ -23,16 +23,14 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  // TODO: get auth userId
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: User })
   async findOne(@UserAuth() userAuth) {
-    return await this.usersService.findById(userAuth.id);
+    return await this.usersService.loadUser(userAuth.id);
   }
 
-  // TODO: get auth userId
   @Patch()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

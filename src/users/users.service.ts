@@ -22,17 +22,15 @@ export class UsersService {
       data: createUserDto,
     });
 
-    delete user.password;
-    return user;
+    return this.responseUser(user);
   }
 
-  async findById(id: string): Promise<User> {
+  async loadUser(id: string): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
 
-    delete user.password;
-    return user;
+    return this.responseUser(user);
   }
 
   // TODO: encript password
@@ -47,6 +45,10 @@ export class UsersService {
       data: updateUserDto,
     });
 
+    return this.responseUser(user);
+  }
+
+  responseUser(user: User) {
     delete user.password;
     return user;
   }
