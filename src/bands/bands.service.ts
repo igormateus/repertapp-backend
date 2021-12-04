@@ -10,6 +10,7 @@ import {
 } from './entities/band.entity';
 import { PrismaService } from './../prisma/prisma.service';
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -20,6 +21,10 @@ import { UpdateBandDto } from './dto/update-band.dto';
 @Injectable()
 export class BandsService {
   constructor(private readonly prismaService: PrismaService) {}
+
+  hasMember(band: Band, userId: string): boolean {
+    return !!band.members.filter((user) => user.id === userId).length;
+  }
 
   async create(creatorId: string, createBandDto: CreateBandDto): Promise<Band> {
     return await this.prismaService.band.create({
@@ -66,9 +71,9 @@ export class BandsService {
     if (!band)
       throw new NotFoundException(`No band found with id: '${bandId}'`);
 
-    const hasMember = band.members.filter((user) => user.id === userId).length;
+    // const hasMember = band.members.filter((user) => user.id === userId).length;
 
-    if (!hasMember)
+    if (!this.hasMember(band, userId))
       throw new ForbiddenException(
         `Unauthorized user to access band with id: '${bandId}'`,
       );
@@ -86,6 +91,27 @@ export class BandsService {
     return await this.prismaService.band.update({
       where: { id: bandId },
       data: updateBandDto,
+      select: { ...bandSelect },
+    });
+  }
+
+  async addMember(
+    userAuthId: string,
+    bandId: string,
+    memberId: string,
+  ): Promise<Band> {
+    const band = await this.findOne(userAuthId, bandId);
+
+    if (this.hasMember(band, memberId))
+      throw new BadRequestException(
+        `Band ${band.name} has mas with User Id ${memberId}`,
+      );
+
+    return await this.prismaService.band.update({
+      where: { id: bandId },
+      data: {
+        members: { connect: { id: memberId } },
+      },
       select: { ...bandSelect },
     });
   }

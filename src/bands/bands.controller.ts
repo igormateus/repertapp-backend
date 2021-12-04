@@ -26,7 +26,7 @@ import { CreateBandDto } from './dto/create-band.dto';
 import { UpdateBandDto } from './dto/update-band.dto';
 import { Band } from './entities/band.entity';
 
-@Controller('bands')
+@Controller('/bands')
 @UseGuards(JwtAuthGuard)
 @ApiTags('bands')
 @ApiBearerAuth()
@@ -43,7 +43,7 @@ export class BandsController {
     return await this.bandsService.create(userAuth.id, createBandDto);
   }
 
-  @Get(':id')
+  @Get('/:id')
   @ApiOkResponse({ type: Band })
   async findOne(@UserAuth() userAuth: AuthDto, @Param('id') id: string) {
     return await this.bandsService.findOne(userAuth.id, id);
@@ -58,7 +58,7 @@ export class BandsController {
     return await this.bandsService.findAll(userAuth.id, connectionArgs);
   }
 
-  @Patch(':id')
+  @Patch('/:id')
   @ApiOkResponse({ type: Band })
   async update(
     @UserAuth() userAuth: AuthDto,
@@ -66,5 +66,15 @@ export class BandsController {
     @Body() updateBandDto: UpdateBandDto,
   ) {
     return await this.bandsService.update(userAuth.id, bandId, updateBandDto);
+  }
+
+  @Post('/:id/addmember/:userId')
+  @ApiOkResponse({ type: Band })
+  async addMember(
+    @UserAuth() userAuth: AuthDto,
+    @Param('id') bandId: string,
+    @Param('userId') memberId: string,
+  ) {
+    return await this.bandsService.addMember(userAuth.id, bandId, memberId);
   }
 }
