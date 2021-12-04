@@ -77,4 +77,14 @@ export class BandsController {
   ) {
     return await this.bandsService.addMember(userAuth.id, bandId, memberId);
   }
+
+  @Post('/:id/removemember/:userId')
+  @ApiOkResponse({ type: Band })
+  async RemoveMember(
+    @UserAuth() userAuth: AuthDto,
+    @Param('id') bandId: string,
+    @Param('userId') memberId: string,
+  ) {
+    return await this.bandsService.removeMember(userAuth.id, bandId, memberId);
+  }
 }

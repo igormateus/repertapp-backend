@@ -102,9 +102,9 @@ export class BandsService {
   ): Promise<Band> {
     const band = await this.findOne(userAuthId, bandId);
 
-    if (this.hasMember(band, memberId))
+    if (userAuthId === memberId || this.hasMember(band, memberId))
       throw new BadRequestException(
-        `Band ${band.name} has mas with User Id ${memberId}`,
+        `Band ${band.name} has member with User Id ${memberId}`,
       );
 
     return await this.prismaService.band.update({
@@ -114,5 +114,39 @@ export class BandsService {
       },
       select: { ...bandSelect },
     });
+  }
+
+  async removeMember(
+    userAuthId: string,
+    bandId: string,
+    memberId: string,
+  ): Promise<Band> {
+    const band = await this.findOne(userAuthId, bandId);
+
+    if (userAuthId !== memberId && !this.hasMember(band, memberId))
+      throw new BadRequestException(
+        `Band ${band.name} hasn't member with User Id ${memberId}`,
+      );
+
+    const where = { id: bandId };
+    const select = { ...bandSelect };
+
+    if (band.members.length === 1) {
+      await this.prismaService.band.delete({
+        where,
+        select,
+      });
+      return null;
+    } else {
+      return this.prismaService.band.update({
+        where,
+        select,
+        data: {
+          members: {
+            disconnect: { id: memberId },
+          },
+        },
+      });
+    }
   }
 }
