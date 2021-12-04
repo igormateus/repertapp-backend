@@ -62,9 +62,9 @@ export class BandsController {
   @ApiOkResponse({ type: Band })
   async update(
     @UserAuth() userAuth: AuthDto,
-    @Param('id') id: string,
+    @Param('id') bandId: string,
     @Body() updateBandDto: UpdateBandDto,
   ) {
-    return await this.bandsService.update(userAuth.id, id, updateBandDto);
+    return await this.bandsService.update(userAuth.id, bandId, updateBandDto);
   }
 }

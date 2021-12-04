@@ -76,7 +76,11 @@ export class BandsService {
     return band;
   }
 
-  async update(userId: string, bandId: string, updateBandDto: UpdateBandDto) {
+  async update(
+    userId: string,
+    bandId: string,
+    updateBandDto: UpdateBandDto,
+  ): Promise<Band> {
     await this.findOne(userId, bandId);
 
     return await this.prismaService.band.update({
