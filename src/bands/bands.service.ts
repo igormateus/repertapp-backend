@@ -5,6 +5,7 @@ import {
   bandSelect,
   bandSummarySelect,
   BandSummaryType,
+  BandType,
 } from './entities/band.entity';
 import { PrismaService } from './../prisma/prisma.service';
 import {
@@ -52,11 +53,9 @@ export class BandsService {
     return new Page<BandSummaryType>(bandsPage);
   }
 
-  async findOne(userId: string, bandId: string) {
+  async findOne(userId: string, bandId: string): Promise<BandType> {
     const band = await this.prismaService.band.findUnique({
-      where: {
-        id: bandId,
-      },
+      where: { id: bandId },
       select: { ...bandSelect },
     });
 

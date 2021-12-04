@@ -29,8 +29,8 @@ import { Band } from './entities/band.entity';
 @Controller('bands')
 @UseGuards(JwtAuthGuard)
 @ApiTags('bands')
-@ApiExtraModels(Page)
 @ApiBearerAuth()
+@ApiExtraModels(Page)
 export class BandsController {
   constructor(private readonly bandsService: BandsService) {}
 
@@ -43,6 +43,12 @@ export class BandsController {
     return await this.bandsService.create(userAuth.id, createBandDto);
   }
 
+  @Get(':id')
+  @ApiOkResponse({ type: Band })
+  async findOne(@UserAuth() userAuth: AuthDto, @Param('id') id: string) {
+    return await this.bandsService.findOne(userAuth.id, id);
+  }
+
   @Get()
   @ApiPageResponse(Band)
   async findAll(
@@ -50,12 +56,6 @@ export class BandsController {
     @Query() connectionArgs: ConnectionArgs,
   ) {
     return await this.bandsService.findAll(userAuth.id, connectionArgs);
-  }
-
-  @Get(':id')
-  @ApiOkResponse({ type: Band })
-  async findOne(@UserAuth() userAuth: AuthDto, @Param('id') id: string) {
-    return await this.bandsService.findOne(userAuth.id, id);
   }
 
   @Patch(':id')

@@ -28,6 +28,7 @@ export type BandType = {
   updatedAt: Date;
   name: string;
   description: string;
+  members: Profile[];
 };
 
 type BandSelect = {
