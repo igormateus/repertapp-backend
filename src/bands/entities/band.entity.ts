@@ -19,7 +19,7 @@ export class Band implements BandPrisma {
   description: string;
 
   @ApiProperty({ type: [Profile] })
-  member: Profile[];
+  members: Profile[];
 }
 
 export type BandType = {

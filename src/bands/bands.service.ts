@@ -2,6 +2,7 @@ import { Page } from './../page/page.dto';
 import { ConnectionArgs } from './../page/connection-args.dto';
 import { findManyCursorConnection } from '@devoxa/prisma-relay-cursor-connection';
 import {
+  Band,
   bandSelect,
   bandSummarySelect,
   BandSummaryType,
@@ -20,7 +21,7 @@ import { UpdateBandDto } from './dto/update-band.dto';
 export class BandsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(creatorId: string, createBandDto: CreateBandDto) {
+  async create(creatorId: string, createBandDto: CreateBandDto): Promise<Band> {
     return await this.prismaService.band.create({
       data: {
         ...createBandDto,
@@ -32,7 +33,10 @@ export class BandsService {
     });
   }
 
-  async findAll(userId: string, connectionArgs: ConnectionArgs) {
+  async findAll(
+    userId: string,
+    connectionArgs: ConnectionArgs,
+  ): Promise<Page<BandSummaryType>> {
     const where = {
       members: {
         some: { id: userId },
@@ -46,7 +50,7 @@ export class BandsService {
           where,
           select: bandSummarySelect,
         }),
-      () => this.prismaService.band.count(),
+      () => this.prismaService.band.count({ where }),
       connectionArgs,
     );
 
