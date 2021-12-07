@@ -71,8 +71,6 @@ export class BandsService {
     if (!band)
       throw new NotFoundException(`No band found with id: '${bandId}'`);
 
-    // const hasMember = band.members.filter((user) => user.id === userId).length;
-
     if (!this.hasMember(band, userId))
       throw new ForbiddenException(
         `Unauthorized user to access band with id: '${bandId}'`,
@@ -123,7 +121,12 @@ export class BandsService {
   ): Promise<Band> {
     const band = await this.findOne(userAuthId, bandId);
 
-    if (userAuthId !== memberId && !this.hasMember(band, memberId))
+    if (band.members.length === 1)
+      throw new BadRequestException(
+        `You cannot remove the last user from band '${band.name}'`,
+      );
+
+    if (!this.hasMember(band, memberId))
       throw new BadRequestException(
         `Band ${band.name} hasn't member with User Id ${memberId}`,
       );
@@ -131,22 +134,14 @@ export class BandsService {
     const where = { id: bandId };
     const select = { ...bandSelect };
 
-    if (band.members.length === 1) {
-      await this.prismaService.band.delete({
-        where,
-        select,
-      });
-      return null;
-    } else {
-      return this.prismaService.band.update({
-        where,
-        select,
-        data: {
-          members: {
-            disconnect: { id: memberId },
-          },
+    return this.prismaService.band.update({
+      where,
+      select,
+      data: {
+        members: {
+          disconnect: { id: memberId },
         },
-      });
-    }
+      },
+    });
   }
 }
