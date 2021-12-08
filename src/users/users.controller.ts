@@ -29,7 +29,6 @@ export class UsersController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: User })
   async findOne(@UserAuth() userAuth: AuthDto) {
-    console.log(userAuth);
     return await this.usersService.loadUser(userAuth.id);
   }
 
