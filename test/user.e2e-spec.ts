@@ -1,3 +1,4 @@
+import { PrismaService } from './../src/prisma/prisma.service';
 import {
   ClassSerializerInterceptor,
   HttpStatus,
@@ -8,16 +9,24 @@ import { HttpAdapterHost, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
-import configuration from './../src/config/configuration';
-import { PrismaClientExceptionFilter } from './../src/filters/prisma-client-exception.filter';
-import { CreateUserDto } from './../src/users/dto/create-user.dto';
+import { AppModule } from '../src/app.module';
+import configuration from '../src/config/configuration';
+import { PrismaClientExceptionFilter } from '../src/filters/prisma-client-exception.filter';
+import { CreateUserDto } from '../src/users/dto/create-user.dto';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
   const user: CreateUserDto = {
     username: 'test_user',
+    password: '123456',
+    email: null,
+    name: null,
+    bio: null,
+  };
+
+  const user2: CreateUserDto = {
+    username: 'test_user2',
     password: '123456',
     email: null,
     name: null,
@@ -139,34 +148,46 @@ describe('AppController (e2e)', () => {
             expect(body.email).toEqual(user.email);
           });
       });
+
+      it('should return error for username duplicated', async () => {
+        const token = await accessToken(user.username, user.password);
+
+        await request(app.getHttpServer())
+          .post('/users')
+          .set('Accept', 'application/json')
+          .send(user2);
+
+        return await request(app.getHttpServer())
+          .patch('/users')
+          .set('Accept', 'application/json')
+          .auth(token, { type: 'bearer' })
+          .send({ username: user2.username })
+          .expect(HttpStatus.CONFLICT);
+      });
+
+      it('should return error for email duplicated', async () => {
+        const token = await accessToken(user2.username, user2.password);
+
+        return await request(app.getHttpServer())
+          .patch('/users')
+          .set('Accept', 'application/json')
+          .auth(token, { type: 'bearer' })
+          .send({ email: user.email })
+          .expect(HttpStatus.CONFLICT);
+      });
     });
   });
 
-  // describe('/auth', () => {
-  //   describe('/login (POST)', () => {
-  //     it('should validate user', async () => {
-  //       const user: LoginDto = {
-  //         username: 'yallirodrigues',
-  //         password: '123456',
-  //       };
-
-  //       return await request(app.getHttpServer())
-  //         .post('/auth/login')
-  //         .set('Accept', 'application/json')
-  //         .send(user)
-  //         .expect(({ body }) => {
-  //           expect(body.accessToken).toBeDefined();
-  //         })
-  //         .expect(HttpStatus.CREATED);
-  //     });
-
-  //     it('shoud reject duplicate registration', () => {
-  //       return null;
-  //     });
-  //   });
-  // });
-
   afterAll(async () => {
+    const prismaService = app.get<PrismaService>(PrismaService);
+
+    await prismaService.user.delete({
+      where: { username: user.username },
+    });
+    await prismaService.user.delete({
+      where: { username: user2.username },
+    });
+
     await app.close();
   });
 });
