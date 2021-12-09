@@ -93,6 +93,14 @@ export class BandsService {
     });
   }
 
+  async delete(userAuthId: string, bandId: string): Promise<void> {
+    await this.findOne(userAuthId, bandId);
+
+    await this.prismaService.band.delete({
+      where: { id: bandId },
+    });
+  }
+
   async addMember(
     userAuthId: string,
     bandId: string,

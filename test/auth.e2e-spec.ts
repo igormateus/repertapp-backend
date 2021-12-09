@@ -72,10 +72,10 @@ describe('AppController (e2e)', () => {
           .post('/auth/login')
           .set('Accept', 'application/json')
           .send({ username: user.username, password: user.password })
+          .expect(HttpStatus.CREATED)
           .expect(({ body }) => {
             expect(body.accessToken).toBeDefined();
-          })
-          .expect(HttpStatus.CREATED);
+          });
       });
 
       it('should return error for invalid user', async () => {

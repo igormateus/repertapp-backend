@@ -5,6 +5,7 @@ import { ConnectionArgs } from './../page/connection-args.dto';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -16,6 +17,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -66,6 +68,12 @@ export class BandsController {
     @Body() updateBandDto: UpdateBandDto,
   ) {
     return await this.bandsService.update(userAuth.id, bandId, updateBandDto);
+  }
+
+  @Delete('/:id')
+  @ApiNoContentResponse()
+  async delete(@UserAuth() userAuth: AuthDto, @Param('id') bandId: string) {
+    return await this.bandsService.delete(userAuth.id, bandId);
   }
 
   @Post('/:id/addmember/:userId')
