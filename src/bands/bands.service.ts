@@ -94,7 +94,12 @@ export class BandsService {
   }
 
   async delete(userAuthId: string, bandId: string): Promise<void> {
-    await this.findOne(userAuthId, bandId);
+    const band = await this.findOne(userAuthId, bandId);
+
+    if (band.members.length > 1)
+      throw new BadRequestException(
+        `Band ${band.name} must have only one user to be deleted`,
+      );
 
     await this.prismaService.band.delete({
       where: { id: bandId },

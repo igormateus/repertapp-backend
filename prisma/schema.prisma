@@ -35,6 +35,48 @@ model Band {
   description String?
 
   members User[]
+  musics  Music[]
 
   @@map("bands")
+}
+
+model Music {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  name         String
+  artist       String
+  tone         String
+  isPlayed     Boolean @default(false)
+  score        Int     @default(1000)
+  counterPlays Int     @default(0)
+
+  links Link[]
+  tags  Tag[]
+
+  bandId String
+  band   Band   @relation(fields: [bandId], references: [id])
+
+  @@map("musics")
+}
+
+model Link {
+  id          String @id @default(cuid())
+  url         String
+  description String
+
+  musicId String
+  music   Music  @relation(fields: [musicId], references: [id])
+
+  @@map("links")
+}
+
+model Tag {
+  id   String @id @default(cuid())
+  name String
+
+  musics Music[]
+
+  @@map("tags")
 }
